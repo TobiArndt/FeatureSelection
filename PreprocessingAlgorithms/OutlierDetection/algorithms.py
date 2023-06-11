@@ -19,19 +19,22 @@ class OutlierLOF(BaseEstimator, TransformerMixin):
     self.contamination = contamination
     self.estimator = LocalOutlierFactor(
         n_neighbors=self.n_neighbours,
-        contamination=self.contamination,
-        novelty=True
+        contamination=self.contamination
     )
 
   def fit(self, X, y = None):
-    X_out = X.copy(deep=True)
-    X_out = X_out.fillna(0)
-    self.estimator.fit(X_out)
     return self
 
   def transform(self, X):
     X_out = X.copy(deep=True)
     X_out = X_out.fillna(0)
+    y_pred = self.estimator.fit_predict(X_out)
+    X_out = X_out[np.where(y_pred == 1, True, False)]
+    return X_out
+    '''
+    X_out = X.copy(deep=True)
+    X_out = X_out.fillna(0)
     y_pred = self.estimator.predict(X_out)
     X_out = X_out[np.where(y_pred == 1), True, False]
     return X_out
+    '''
