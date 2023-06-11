@@ -11,7 +11,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import KFold, cross_val_score
 import numpy as np
 
-kf = KFold(n_splits=3, random_state=42, shuffle=True)
+kf = KFold(n_splits=6, random_state=42, shuffle=True)
 def cv_rmse(model, train, y_train):
     rmse = np.sqrt(-cross_val_score(model, train, y_train, scoring="neg_mean_squared_error", cv=kf))
     return (rmse)
