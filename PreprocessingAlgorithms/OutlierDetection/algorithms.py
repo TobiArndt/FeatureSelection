@@ -1,8 +1,9 @@
+from PreprocessingAlgorithms.preprocessing_base import PreprocessingBase
+
 from sklearn.neighbors import LocalOutlierFactor
-from sklearn.base import BaseEstimator, TransformerMixin
 import numpy as np
 
-class OutlierIQR(BaseEstimator, TransformerMixin):
+class OutlierIQR(PreprocessingBase):
   def fit(self, X, y = None):
     return self
 
@@ -13,7 +14,7 @@ class OutlierIQR(BaseEstimator, TransformerMixin):
     X_out = X[~((X < (Q1 - 1.5 * IQR)) | (X > (Q3 + 1.5 * IQR))).any(axis=1)]
     return X_out
 
-class OutlierLOF(BaseEstimator, TransformerMixin):
+class OutlierLOF(PreprocessingBase):
   def __init__(self, n_neighbours=20, contamination='auto'):
     self.n_neighbours = n_neighbours
     self.contamination = contamination

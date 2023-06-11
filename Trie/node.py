@@ -34,10 +34,11 @@ class PreprocessNode:
     
     return self.children_nodes[key]
 
-  def process(self, df):
+  def process(self, df, experiment_handler):
     df_out = df.copy(deep=True)
     if self.processed == False:
       print(f'\t Start fitting...')
+      self.obj.set_experiment_handler(experiment_handler)
       self.obj.fit(df_out)
       self.processed = True
       print(f'\t Fitting done!')
@@ -57,19 +58,20 @@ class PreprocessNode:
       elif fn is None:
         n = n.add_child(key, None)
       else:
+
         n = n.add_child(key, fn())
       path_out.append(n)
 
     return path_out
 
-  def process_path(self, path_as_strings, df):
+  def process_path(self, path_as_strings, df, experiment_handler):
     n = self 
    
     df_processed = df.copy(deep=True)
     for idx, p in enumerate(path_as_strings):
       n = n.children_nodes[p]
       print(f'({idx + 1} / {len(path_as_strings)}) Preprocess: {n.obj.__class__.__name__}')
-      df_processed = n.process(df_processed)
+      df_processed = n.process(df_processed, experiment_handler)
 
     return df_processed
 

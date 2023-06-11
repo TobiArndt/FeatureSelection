@@ -38,7 +38,7 @@ class Search:
             return self.cache[tuple(path)]
         
         print(f'Path to check: {path}')
-        df = self.trie.preprocess(path, self.dataset)
+        df = self.trie.preprocess(path, self.dataset, self.experiment_handler)
         best_score = self.experiment_handler.next_experiment(path, df)
         self.cache[tuple(path)] = best_score
         return best_score

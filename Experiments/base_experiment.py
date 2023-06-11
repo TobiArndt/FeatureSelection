@@ -9,7 +9,13 @@ class ExperimentExecuter:
     self.model_generator_fn = model_generator_fn
     self.models_to_check = models_to_check
     
-
+  def copy(self):
+    return ExperimentExecuter(
+      target = self.target,
+      objective_fn= self.objective_fn,
+      model_generator_fn=self.model_generator_fn,
+      models_to_check=self.models_to_check
+    )
 
 
   def next_experiment(self, path, dataset):

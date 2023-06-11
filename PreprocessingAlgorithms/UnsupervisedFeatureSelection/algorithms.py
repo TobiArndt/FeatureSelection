@@ -1,8 +1,10 @@
-from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.feature_selection import VarianceThreshold
 import numpy as np
 
-class ColumnDropper(BaseEstimator, TransformerMixin):
+from PreprocessingAlgorithms.preprocessing_base import PreprocessingBase
+
+
+class ColumnDropper(PreprocessingBase):
   def __init__(self, columns):
     self.columns = columns
     self.columns_left = None
@@ -16,7 +18,7 @@ class ColumnDropper(BaseEstimator, TransformerMixin):
     return X_dropped
   
 
-class VarianceThresholdHandler(BaseEstimator, TransformerMixin):
+class VarianceThresholdHandler(PreprocessingBase):
   def __init__(self, thresh):
     self.thresh = thresh
     self.vt = VarianceThreshold(threshold=thresh)

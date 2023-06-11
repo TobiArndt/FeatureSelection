@@ -1,9 +1,10 @@
-from sklearn.base import BaseEstimator, TransformerMixin
+from PreprocessingAlgorithms.preprocessing_base import PreprocessingBase
 from scipy.stats import skew, norm
 from scipy.special import boxcox1p
 from scipy.stats import boxcox_normmax
 
-class BoxCoxTransform(BaseEstimator, TransformerMixin):
+
+class BoxCoxTransform(PreprocessingBase):
   def __init__(self, skewing_threshold):
     self.skewing_threshold = skewing_threshold
     self.skew_index = None

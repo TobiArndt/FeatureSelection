@@ -3,7 +3,7 @@ from PreprocessingAlgorithms.Distributions.algorithms import BoxCoxTransform
 from PreprocessingAlgorithms.OutlierDetection.algorithms import OutlierIQR, OutlierLOF
 from PreprocessingAlgorithms.UnsupervisedFeatureSelection.algorithms import ColumnDropper, VarianceThresholdHandler
 from PreprocessingAlgorithms.Imputing.algorithms import ImputerStupid, ImputerIterative
-from PreprocessingAlgorithms.building_parts import Identity, build
+from PreprocessingAlgorithms.Utils.building_parts import Identity, build, BuildingPart
 from Trie.node import PreprocessNode
 from Utils.visualizer import visualize_tree
 
@@ -81,34 +81,7 @@ class KeyFnPairGeneratorAll:
 
 class ExperimentTrie:
     def __init__(self, name = 'Numeric',
-                 building_blocks=
-                            [
-                                [
-                                    (A.Feature_ColumnDropper,{'columns':['ELONGATION_RUNNING', 'SEAM_STRENGTH_RUNNING', 'TENSILE_STRENGTH_CROSS_RUNNING']}), 
-                                    (A.Optional,)
-                                ],
-                                [
-                                    (A.Feature_Variance,{'thresh': 0.1}), 
-                                    (A.Optional,)
-                                ],
-                                [
-                                    (A.Distribution_BoxCox,{'skewing_threshold': 0.3}), 
-                                    (A.Optional,)
-                                ],
-                                [
-                                    (A.Correlation_VIF,{'vif_thresh': 5}),
-                                    (A.Optional,)
-                                ],
-                                [
-                                    (A.Outlier_IQR,), 
-                                    (A.Outlier_LOF,), 
-                                    (A.Optional,)
-                                ],
-                                [   
-                                    (A.Imputer_Iterative,{'estimator': 'BayesianRidge', 'tolerance': 1e-3, 'max_iter': 25}), 
-                                    (A.Optional,)
-                                ]
-                            ]
+                 building_blocks=[]
                  ):
         self.building_blocks = building_blocks
         self.name = name
@@ -116,7 +89,7 @@ class ExperimentTrie:
 
     def construct_experiment(self):
         building_blocks_out = []
-        identity = ('Identity', build(Identity))
+        identity = ('Identity', BuildingPart(Identity))
 
         for block in self.building_blocks:
             block_out = []
@@ -126,11 +99,11 @@ class ExperimentTrie:
                 else:
                     if len(p) == 2:
                         block_out.append(
-                            (A(p[0]).name, build(building_map[p[0]], **p[1]))
+                            (A(p[0]).name, BuildingPart(building_map[p[0]], p[1]))
                         )
                     else:
                         block_out.append(
-                            (A(p[0]).name, build(building_map[p[0]]))
+                            (A(p[0]).name, BuildingPart(building_map[p[0]]))
                         )
 
             building_blocks_out.append(block_out)
@@ -142,8 +115,8 @@ class ExperimentTrie:
 
         return root
     
-    def preprocess(self, path, dataset):
-       new_df = self.trie.process_path(path, dataset)
+    def preprocess(self, path, dataset, experiment_handler):
+       new_df = self.trie.process_path(path, dataset, experiment_handler)
        return new_df
 
 if __name__ == '__main__':

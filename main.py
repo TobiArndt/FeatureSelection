@@ -5,6 +5,7 @@ from Experiments.base_experiment import ExperimentExecuter
 from Models.definitions_simple import model_generator, cv_rmse
 from construction import A
 from SearchStrategies.pte import Search
+from PreprocessingAlgorithms.Utils.optimizer_utils import SuggestFloat, SuggestLogUniform
 
 if __name__ == '__main__':
     data = pd.read_csv('df_all_merged.csv', index_col=0)
@@ -82,14 +83,15 @@ if __name__ == '__main__':
     train_num = train[numerical_cols_s1 + numerical_cols_labrep]
     print(train_num.shape)
     print(train_num.columns)
-
+    '''
     config = [
                 [
                     (A.Feature_ColumnDropper,{'columns':['ELONGATION_RUNNING', 'SEAM_STRENGTH_RUNNING', 'TENSILE_STRENGTH_CROSS_RUNNING']}), 
                     (A.Optional,)
                 ],
                 [
-                    (A.Feature_Variance,{'thresh': 0.1}), 
+                    #(A.Feature_Variance,{'thresh': SuggestLogUniform(0.03, 0.2)}), 
+                    (A.Feature_Variance, {'thresh': 0.1}),
                     (A.Optional,)
                 ],
                 [
@@ -97,8 +99,36 @@ if __name__ == '__main__':
                     (A.Optional,)
                 ],
                 [
-                    (A.Correlation_VIF,{'vif_thresh': 5}),
+                    #(A.Correlation_VIF,{'vif_thresh': SuggestFloat(4.0, 10.0)}),
+                    (A.Correlation_VIF,{'vif_thresh': 5.0}),
+                ],
+                [
+                    (A.Outlier_IQR,), 
+                    (A.Outlier_LOF,), 
                     (A.Optional,)
+                ],
+                [   
+                    (A.Imputer_Iterative,{'estimator': 'BayesianRidge', 'tolerance': 1e-3, 'max_iter': 25}), 
+                    (A.Optional,)
+                ]
+            ]
+    '''
+
+    config = [
+                [
+                    (A.Feature_ColumnDropper,{'columns':['ELONGATION_RUNNING', 'SEAM_STRENGTH_RUNNING', 'TENSILE_STRENGTH_CROSS_RUNNING']}), 
+                    (A.Optional,)
+                ],
+                [
+                    (A.Feature_Variance,{'thresh': SuggestLogUniform(0.03, 0.2)}), 
+                    (A.Optional,)
+                ],
+                [
+                    (A.Distribution_BoxCox,{'skewing_threshold': 0.3}), 
+                    (A.Optional,)
+                ],
+                [
+                    (A.Correlation_VIF,{'vif_thresh': SuggestFloat(4.0, 10.0)}),
                 ],
                 [
                     (A.Outlier_IQR,), 
@@ -111,7 +141,6 @@ if __name__ == '__main__':
                 ]
             ]
 
-
     experiment_handler = ExperimentExecuter(
         target='FELT_LIFE_NET',
         objective_fn=cv_rmse,
@@ -119,6 +148,6 @@ if __name__ == '__main__':
         models_to_check=['svr', 'lgbm'])
     trie = ExperimentTrie(name = 'Numeric', building_blocks= config)
     search = Search(trie= trie, experiment_handler= experiment_handler)
-    search.start(train_num, n_trials=10)
+    search.start(train_num, n_trials=1)
 
 
