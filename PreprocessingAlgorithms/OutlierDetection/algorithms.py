@@ -16,8 +16,8 @@ class OutlierIQR(BaseEstimator, TransformerMixin):
 class OutlierLOF(BaseEstimator, TransformerMixin):
   def __init__(self, n_neighbours=20, contamination='auto'):
     self.n_neighbours = n_neighbours
-    self.contamination = contamination
-    self.estimator = LocalOutlierFactor(
+    self.contaminatin = contamination
+    self.lof = LocalOutlierFactor(
         n_neighbors=self.n_neighbours,
         contamination=self.contamination
     )
@@ -28,7 +28,7 @@ class OutlierLOF(BaseEstimator, TransformerMixin):
   def transform(self, X):
     X_out = X.copy(deep=True)
     X_out = X_out.fillna(0)
-    y_pred = self.estimator.fit_predict(X_out)
+    y_pred = self.lof.fit_predict(X_out)
     X_out = X_out[np.where(y_pred == 1, True, False)]
     return X_out
     '''
