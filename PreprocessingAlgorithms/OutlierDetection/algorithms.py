@@ -19,7 +19,8 @@ class OutlierLOF(BaseEstimator, TransformerMixin):
     self.contamination = contamination
     self.estimator = LocalOutlierFactor(
         n_neighbors=self.n_neighbours,
-        contamination=self.contamination
+        contamination=self.contamination,
+        novelty=True
     )
 
   def fit(self, X, y = None):
