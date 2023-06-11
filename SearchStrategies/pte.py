@@ -9,6 +9,7 @@ class Search:
         self.potential_stages = self.create_potential_stages()
         self.study = optuna.create_study(direction='minimize', study_name='regression')
         self.dataset = None
+        self.cache = {}
 
 
     def create_potential_stages(self):
@@ -33,8 +34,13 @@ class Search:
     
     def objective(self, trial):
         path = self.get_stages(trial)
+        if tuple(path) in self.cache.keys():
+            return self.cache[tuple(path)]
+        
+        print(f'Path to check: {path}')
         df = self.trie.preprocess(path, self.dataset)
         best_score = self.experiment_handler.next_experiment(path, df)
+        self.cache[tuple(path)] = best_score
         return best_score
 
 
