@@ -2,8 +2,9 @@ from construction import A
 import optuna
 
 class Search:
-    def __init__(self, trie, experiment_handler):
+    def __init__(self, trie, experiment_handler, model_fn):
         self.trie = trie
+        self.model_fn = model_fn
         self.all_building_blocks = trie.building_blocks
         self.experiment_handler = experiment_handler
         self.potential_stages = self.create_potential_stages()
@@ -39,7 +40,8 @@ class Search:
         
         print(f'Path to check: {path}')
         df = self.trie.preprocess(path, self.dataset, self.experiment_handler)
-        best_score = self.experiment_handler.next_experiment(path, df)
+        model, params = self.model_fn(trial)
+        best_score = self.experiment_handler.next_experiment(model, path, df, params)
         self.cache[tuple(path)] = best_score
         return best_score
 

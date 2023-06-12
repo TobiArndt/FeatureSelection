@@ -1,13 +1,19 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from construction import ExperimentTrie
-from Experiments.base_experiment import ExperimentExecuter
+from Experiments.pte_experiment import ExperimentExecuter
 #from Models.definitions_simple import model_generator, cv_rmse
 from Models.definitions_internal_optimisation import get_lgbm
 from Objectives.definitions_kf import cv_rmse
 from construction import A
 from SearchStrategies.pte import Search
 from PreprocessingAlgorithms.Utils.optimizer_utils import SuggestFloat, SuggestLogUniform
+
+import optuna
+optuna.logging.set_verbosity(optuna.logging.CRITICAL)
+
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 if __name__ == '__main__':
     data = pd.read_csv('df_all_merged.csv', index_col=0)
@@ -122,7 +128,7 @@ if __name__ == '__main__':
                     (A.Optional,)
                 ],
                 [
-                    (A.Feature_Variance,{'thresh': SuggestLogUniform(0.03, 0.2)}), 
+                    (A.Feature_Variance,{'thresh': 0.3}), 
                     (A.Optional,)
                 ],
                 [
@@ -130,7 +136,7 @@ if __name__ == '__main__':
                     (A.Optional,)
                 ],
                 [
-                    (A.Correlation_VIF,{'vif_thresh': SuggestFloat(4.0, 10.0)}),
+                    (A.Correlation_VIF,{'vif_thresh': 5}),
                 ],
                 [
                     (A.Outlier_IQR,), 
@@ -145,11 +151,9 @@ if __name__ == '__main__':
 
     experiment_handler = ExperimentExecuter(
         target='FELT_LIFE_NET',
-        objective_fn=cv_rmse,
-        model_generator_fn=model_generator,
-        models_to_check=['svr', 'lgbm'])
+        objective_fn=cv_rmse)
     trie = ExperimentTrie(name = 'Numeric', building_blocks= config)
-    search = Search(trie= trie, experiment_handler= experiment_handler)
-    search.start(train_num, n_trials=1)
+    search = Search(trie= trie, experiment_handler= experiment_handler, model_fn=get_lgbm)
+    search.start(train_num, n_trials=10)
 
 
