@@ -68,7 +68,7 @@ def get_gbr(trial):
                                       random_state=42)
     return gbr
 
-'''
+
 def model_generator():
   lightgbm = LGBMRegressor(objective='regression', 
                        num_leaves=6,
@@ -120,4 +120,3 @@ def model_generator():
             'lgbm': lightgbm}
 
   return models
-'''
