@@ -27,7 +27,7 @@ class ExperimentExecuter:
     if model_params is not None:
         result.update(model_params)
     
-    dataset.to_csv(f'/content/{str(score.mean())[:5].replace(".", "_")}_{name}.csv')
+    dataset.to_csv(f'/content/{str(score.mean())[:5].replace(".", "_")}_{name}_cols{dataset.shape[1]}.csv')
 
     self.scores.append(result)
     print(f'\t Done.')
